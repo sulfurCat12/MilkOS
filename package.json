@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "ollama": "^0.6.4"
+  },
+  "name": "milkOS",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/main.js",
+  "author": "sulfurCat12",
+  "license": "ISC"
+}
