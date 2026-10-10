@@ -1,6 +1,8 @@
 import ollama from 'ollama';
 import fs from 'fs';
 
+import messageFactory from './messageFactory.js';
+
 const corePath = "./src/llm";
 const profilePath = JSON.parse(fs.readFileSync(`${corePath}/profile.json`, 'utf8'));
 const systemPath = `${corePath}/system.txt`;
@@ -8,30 +10,14 @@ const systemPath = `${corePath}/system.txt`;
 async function trigger(prompt) {
     let conversation = [];
 
-    const systemMessage = {
-        role: 'system',
-        content: fs.readFileSync(systemPath, 'utf-8').trim()
-    };
-
-    const messenger = {
-        role: 'system',
-        content: `The name of the person you're currently talking with is ${profilePath.name}`
-    };
-
-    const userMessage = {
-        role: 'user',
-        content: prompt
-    };
-
-    console.log("userInput: " + prompt);
-    console.log("( Processing . . . )");
+    console.log(`userInput: ${prompt}\n( Processing . . . )`);
 
     const response = await ollama.chat({
         model: 'llama3.2:3b',
         messages: [
-            systemMessage,
-            messenger,
-            userMessage
+            messageFactory.createSystem(systemPath),
+            messageFactory.createSystemRole(profilePath),
+            messageFactory.createUser(prompt)
         ],
         options: {
             temperature: 0.9,
@@ -48,7 +34,7 @@ async function trigger(prompt) {
         );
     }
 
-    conversation.push(userMessage);
+    conversation.push(messageFactory.createUser(prompt));
     conversation.push({
         role: 'assistant',
         content: response.message.content
@@ -59,6 +45,6 @@ async function trigger(prompt) {
     return response.message.content;
 }
 
-trigger("Hence and so forth you can just call me sulfur lol").then(response => {
-    console.log("Response: " + response);
+trigger("okay").then(response => {
+    console.log(`Response: ${response}`)
 });
